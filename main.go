@@ -118,12 +118,91 @@ func vowels(arr []string) []string {
 	return arr
 }
 
-func punctuation(arr [] string)[]string {
-	for i := 0; i < len(arr)-1; i++{
-		if len(arr[i+1]) > 0 {
-			 
+func punctuationsHandler(arr []string) []string {
+	i := 1
+	for i < len(arr) {
+		if arr[i] != "" {
+			if arr[i][0] == ',' || arr[i][0] == '.' || arr[i][0] == ':' || arr[i][0] == '!' || arr[i][0] == '?' || arr[i][0] == ';' {
+				arr[i-1] += arr[i][:1]
+				if len(arr[i]) > 1 {
+					arr[i] = arr[i][1:]
+				} else {
+					arr = append(arr[:i], arr[i+1:]...)
+				}
+				continue
+			}
 		}
+		i++
 	}
+	return arr
+}
+
+func mergeQuotedStrings(arr []string) []string {
+	n := len(arr)
+	if n == 0 {
+		return arr
+	}
+
+	var result []string
+	i := 0
+
+	for i < n {
+		if len(arr[i]) > 0 && arr[i][0] == '\'' {
+			// Accumulate parts of the string within quotes
+			temp := []string{}
+			j := i
+			inQuotes := false
+
+			for ; j < n; j++ {
+				current := arr[j]
+				startsQuote := current[0] == '\''
+				endsQuote := current[len(current)-1] == '\''
+
+				if startsQuote && endsQuote && len(current) == 1 {
+					// Current string is just "'", handle specially
+					if inQuotes {
+						// Close the current quote
+						inQuotes = false
+					} else {
+						// Open a new quote
+						inQuotes = true
+					}
+					continue
+				}
+
+				if startsQuote {
+					// Strip leading quote if not already inside quotes
+					if !inQuotes {
+						current = current[1:]
+					}
+					inQuotes = true
+				}
+
+				if endsQuote {
+					// Strip trailing quote if it ends the quote
+					current = current[:len(current)-1]
+					inQuotes = false
+				}
+
+				// Append the current processed string part
+				temp = append(temp, current)
+
+				if !inQuotes {
+					// Quote closed, stop processing further
+					break
+				}
+			}
+
+			// Join all parts gathered within the quotes, add to result
+			result = append(result, "'"+strings.Join(temp, " ")+"'")
+			i = j // Move the index past the processed segment
+		} else {
+			result = append(result, arr[i])
+		}
+		i++
+	}
+
+	return result
 }
 
 func main() {
@@ -140,5 +219,7 @@ func main() {
 	arr = nums(arr)
 	arr = major(arr)
 	arr = vowels(arr)
+	arr = punctuationsHandler(arr)
+	arr = mergeQuotedStrings(arr)
 	fmt.Println(strings.Join(arr, " "))
 }
