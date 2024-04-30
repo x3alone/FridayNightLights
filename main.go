@@ -47,73 +47,66 @@ func nums(arr []string) []string {
 	return arr
 }
 
-func major(arr []string) []string {
-	for i := 0; i < len(arr)-1; i++ {
-		if arr[i] == "(up)" && i > 0 {
-			arr[i-1] = strings.ToUpper(arr[i-1])
-			arr[i-1] = fmt.Sprintf("%s", arr[i-1])
-			arr = append(arr[:i], arr[i+1:]...)
-		} else if arr[i] == "(low)" && i > 0 {
-			arr[i-1] = strings.ToLower(arr[i-1])
-			arr[i-1] = fmt.Sprintf("%s", arr[i-1])
-			arr = append(arr[:i], arr[i+1:]...)
-		} else if arr[i] == "(cap)" && i > 0 {
-			if len(arr[i-1]) > 0 {
-				FirstChar := strings.ToUpper(string(arr[i-1][0]))
-				if len(arr[i-1]) > 1 {
-					arr[i-1] = FirstChar + arr[i-1][1:]
-				} else {
-					arr[i-1] = FirstChar
-				}
-			}
-			arr[i-1] = fmt.Sprintf("%s", arr[i-1])
-			arr = append(arr[:i], arr[i+1:]...)
-		} else if strings.ContainsAny(arr[i], "(up,") || strings.ContainsAny(arr[i], "(low,") || strings.ContainsAny(arr[i], "(cap,") {
-			counter, err := strconv.Atoi(strings.Trim(arr[i+1], ")"))
-			o := i - 1
-			if err == nil {
-				for j := 0; j < counter; j++ {
-					if arr[i] == "(up," {
-						arr[o] = strings.ToUpper(arr[o])
-						o--
-					} else if arr[i] == "(low," {
-						arr[o] = strings.ToLower(arr[o])
-						o--
-					} else if arr[i] == "(cap," {
-						Fchar := strings.ToUpper(string(arr[o][0]))
-						if len(arr[o]) > 1 {
-							arr[o] = Fchar + arr[o][1:]
-						} else {
-							arr[o] = Fchar
-						}
-						o--
-					}
-				}
-				arr = append(arr[:i], arr[i+2:]...)
-			}
+func applyFormatBasedOnDirective(arr []string, i int) []string {
+	switch {
+	case arr[i] == "(up)" && i > 0:
+		arr[i-1] = strings.ToUpper(arr[i-1])
+	case arr[i] == "(low)" && i > 0:
+		arr[i-1] = strings.ToLower(arr[i-1])
+	case arr[i] == "(cap)" && i > 0:
+		arr[i-1] = capitalize(arr[i-1])
+	case strings.HasPrefix(arr[i], "(up,") || strings.HasPrefix(arr[i], "(low,") || strings.HasPrefix(arr[i], "(cap,"):
+		if i+1 < len(arr) {
+			arr = applyMultiFormat(arr, i)
 		}
 	}
 	return arr
 }
 
-func vowels(arr []string) []string {
-	for i := 0; i < len(arr)-1; i++ {
-		if len(arr[i+1]) > 0 {
-			FirstLetter := strings.ToLower(string(arr[i+1][0]))
-			if (arr[i] == "a" || arr[i] == "A") && strings.ContainsAny(FirstLetter, "aeiouhAEIOUH") {
-				if arr[i] == "A" {
-					arr[i] = "An"
-				} else if arr[i] == "a" {
-					arr[i] = "an"
-				}
-			} else if (arr[i] == "an" || arr[i] == "An") && !strings.ContainsAny(FirstLetter, "aeiouhAEIOUH") {
-				if arr[i] == "An" {
-					arr[i] = "A"
-				} else if arr[i] == "an" {
-					arr[i] = "a"
-				}
+func capitalize(s string) string {
+	if len(s) > 0 {
+		return strings.ToUpper(string(s[0])) + s[1:]
+	}
+	return s
+}
+
+func applyMultiFormat(arr []string, i int) []string {
+	counter, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(arr[i], "(up,"), ")"))
+	if err != nil {
+		counter, err = strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(arr[i], "(low,"), ")"))
+	}
+	if err != nil {
+		counter, err = strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(arr[i], "(cap,"), ")"))
+	}
+
+	if err == nil {
+		for j := 0; j < counter && (i-j-1) >= 0; j++ {
+			switch {
+			case strings.HasPrefix(arr[i], "(up,"):
+				arr[i-j-1] = strings.ToUpper(arr[i-j-1])
+			case strings.HasPrefix(arr[i], "(low,"):
+				arr[i-j-1] = strings.ToLower(arr[i-j-1])
+			case strings.HasPrefix(arr[i], "(cap,"):
+				arr[i-j-1] = capitalize(arr[i-j-1])
 			}
 		}
+		return append(arr[:i], arr[i+2:]...)
+	}
+	return arr
+}
+
+func processDirectives(arr []string) []string {
+	i := 0
+	for i < len(arr) {
+		if strings.HasPrefix(arr[i], "(") && i > 0 {
+			arr = applyFormatBasedOnDirective(arr, i)
+			if strings.ContainsAny(arr[i], ",") {
+				i -= 2 // adjust for changes in array length
+			} else {
+				i-- // adjust for the removed element
+			}
+		}
+		i++
 	}
 	return arr
 }

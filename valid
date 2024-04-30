@@ -1,0 +1,287 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func ReadFile(name string) (string, error) {
+
+	data, err := os.ReadFile(name)
+	if err != nil {
+	}
+	return string(data), nil
+}
+
+func SplitWhiteSpaces(s string) []string {
+	var result []string
+	var word string
+	for i, c := range s {
+		if c != ' ' && c != '\t' && c != '\n' {
+			word += string(c)
+		}
+		if ((c == ' ' || c == '\t' || c == '\n') && word != "") || i == len(s)-1 {
+			result = append(result, word)
+			word = ""
+		}
+	}
+	return result
+}
+
+func nums(arr []string) []string {
+	for i := 0; i < len(arr); i++ {
+		if arr[i] == "(hex)" && i > 0 {
+			// if arr[i-1] != strconv.Atoi(arr[i-1]){
+			// 	return arr
+			// }
+			if num, err := strconv.ParseInt(arr[i-1], 16, 64); err == nil {
+				arr[i-1] = fmt.Sprintf("%d", num)
+				arr = append(arr[:i], arr[i+1:]...)
+			}
+		} else if arr[i] == "(bin)" && i > 0 {
+			// if arr[i-1] != strconv.Atoi(arr[i-1]){
+			// 	return arr
+			// }
+			if num, err := strconv.ParseInt(arr[i-1], 2, 64); err == nil {
+				arr[i-1] = fmt.Sprintf("%d", num)
+				arr = append(arr[:i], arr[i+1:]...)
+			}
+		}
+	}
+	return arr
+}
+
+func applyToUpper(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToUpper(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToLower(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToLower(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToCapitalize(arr []string, index int) []string {
+	if index > 0 && len(arr[index-1]) > 0 {
+		arr[index-1] = strings.ToLower(string(arr[index-1]))
+		arr[index-1] = strings.ToUpper(string(arr[index-1][0])) + arr[index-1][1:]
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
+	var currentIndex int = index - 1
+	for j := 0; j < counter && currentIndex >= 0; j++ {
+		if directive == "(up," {
+			arr[currentIndex] = strings.ToUpper(arr[currentIndex])
+		} else if directive == "(low," {
+			arr[currentIndex] = strings.ToLower(arr[currentIndex])
+		} else if directive == "(cap," {
+			if len(arr[currentIndex]) > 0 {
+				arr[currentIndex] = strings.ToUpper(string(arr[currentIndex][0])) + arr[currentIndex][1:]
+			}
+		}
+		currentIndex--
+	}
+	return append(arr[:index], arr[index+2:]...)
+}
+
+func major(arr []string) []string {
+	i := 0
+	for i < len(arr) {
+		if strings.HasPrefix(arr[i], "(") && i > 0 {
+			switch arr[i] {
+			case "(up)":
+				arr = applyToUpper(arr, i)
+			case "(low)":
+				arr = applyToLower(arr, i)
+			case "(cap)":
+				arr = applyToCapitalize(arr, i)
+			default:
+				if strings.HasSuffix(arr[i], ",") && i+1 < len(arr) {
+					counter, err := strconv.Atoi(strings.Trim(arr[i+1], ")"))
+					if err == nil {
+						arr = applyRepeatedFormat(arr, arr[i], i, counter)
+						i -= 2 // Adjust for removed elements
+					}
+				}
+			}
+		} else {
+			i++
+		}
+	}
+	filtered := []string{}
+	for _, item := range arr {
+		if !strings.HasPrefix(item, "(") {
+			filtered = append(filtered, item)
+		}
+	}
+	return filtered
+}
+
+
+
+func vowels(arr []string) []string {
+	for i := 0; i < len(arr)-1; i++ {
+		if len(arr[i+1]) > 0 {
+			FirstLetter := strings.ToLower(string(arr[i+1][0]))
+			if (arr[i] == "a" || arr[i] == "A") && strings.ContainsAny(FirstLetter, "aeiouhAEIOUH") {
+				if arr[i] == "A" {
+					arr[i] = "An"
+				} else if arr[i] == "a" {
+					arr[i] = "an"
+				}
+			} else if (arr[i] == "an" || arr[i] == "An") && !strings.ContainsAny(FirstLetter, "aeiouhAEIOUH") {
+				if arr[i] == "An" {
+					arr[i] = "A"
+				} else if arr[i] == "an" {
+					arr[i] = "a"
+				}
+			}
+		}
+	}
+	return arr
+}
+
+func punctuationsHandler(arr []string) []string {
+	i := 1
+	for i < len(arr) {
+		if arr[i] != "" {
+			if arr[i][0] == ',' || arr[i][0] == '.' || arr[i][0] == ':' || arr[i][0] == '!' || arr[i][0] == '?' || arr[i][0] == ';' {
+				arr[i-1] += arr[i][:1]
+				if len(arr[i]) > 1 {
+					arr[i] = arr[i][1:]
+				} else {
+					arr = append(arr[:i], arr[i+1:]...)
+				}
+				continue
+			}
+		}
+		i++
+	}
+	return arr
+}
+
+// func isQuoteValid(s string, position int, totalLen int) bool {
+// 	if position == 0 || position == totalLen-1 {
+// 		return true
+// 	}
+// 	if position > 0 && unicode.IsLower(rune(s[position-1])) && position < totalLen-1 && unicode.IsUpper(rune(s[position+1])) {
+// 		return true
+// 	}
+// 	return false
+// }
+
+// func countSingleQuotesAtEdges(arr []string) int {
+// 	count := 0
+// 	for _, s := range arr {
+// 		if len(s) > 0 {
+// 			if s[0] == '\'' {
+// 				count++
+// 			}
+// 			if len(s) > 1 && s[len(s)-1] == '\'' {
+// 				count++
+// 			} else if len(s) == 1 && s[len(s)-1] == '\'' && s[0] != s[len(s)-1] {
+// 				count++
+// 			}
+// 		}
+// 	}
+// 	return count
+// }
+
+// func mergeQuotedStrings(arr []string) []string {
+// 	n := len(arr)
+// 	if n == 0 {
+// 		return arr
+// 	}
+
+// 	var result []string
+// 	i := 0
+
+// 	for i < n {
+// 		// Determine if the current element starts or ends with a quote
+// 		startsQuote := arr[i][0] == '\''
+// 		endsQuote := arr[i][len(arr[i])-1] == '\''
+
+// 		if startsQuote || endsQuote {
+// 			// Found a start or an end of a quote
+// 			temp := []string{}
+// 			j := i + 1 // Initialize j to start after the current element
+// 			foundSecondQuote := false
+
+// 			// Scan further to find the closing or another opening quote
+// 			for j < n && !foundSecondQuote {
+// 				startsQuoteJ := arr[j][0] == '\''
+// 				endsQuoteJ := arr[j][len(arr[j])-1] == '\''
+// 				if startsQuoteJ || endsQuoteJ {
+// 					foundSecondQuote = true
+// 					break
+// 				}
+// 				j++
+// 			}
+
+// 			if foundSecondQuote {
+// 				// Include everything from i to j (inclusive) in the quoted string
+// 				for k := i; k <= j; k++ {
+// 					if k == i { // For the first element, trim only the last quote if necessary
+// 						if endsQuote {
+// 							temp = append(temp, arr[k][:len(arr[k])-1])
+// 						} else {
+// 							temp = append(temp, arr[k])
+// 						}
+// 					} else if k == j { // For the last element, trim only the first quote if necessary
+// 						if startsQuoteJ {
+// 							temp = append(temp, arr[k][1:])
+// 						} else {
+// 							temp = append(temp, arr[k])
+// 						}
+// 					} else { // For all middle elements, append as they are
+// 						temp = append(temp, arr[k])
+// 					}
+// 				}
+// 				// Join all parts and append to the result
+// 				result = append(result, "'"+strings.Join(temp, " ")+"'")
+// 				i = j // Update i to skip all processed elements
+// 			} else {
+// 				// No second quote found, append the current element as is
+// 				result = append(result, arr[i])
+// 			}
+// 		} else {
+// 			// Current string is not quoted at all
+// 			result = append(result, arr[i])
+// 		}
+// 		i++
+// 	}
+
+// 	return result
+// }
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("file name is not provided")
+		return
+	}
+	file, err := ReadFile(os.Args[1])
+	if err != nil {
+		fmt.Printf("error reading file : %s\n", err)
+		return
+	}
+	arr := SplitWhiteSpaces(file)
+	arr = nums(arr)
+	// arr = applyFormatBasedOnDirective(arr)
+	// arr = applyMultiFormat(arr)
+	// arr = processDirectives(arr)
+	arr = major(arr)
+	arr = vowels(arr)
+	arr = punctuationsHandler(arr)
+	// arr = mergeQuotedStrings(arr)
+	// arr = countSingleQuotesAtEdges(arr)
+	fmt.Println(strings.Join(arr, " "))
+}
+
