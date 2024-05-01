@@ -128,11 +128,11 @@ func IsAlpha(s string) bool { // checks if the string contains alpha by skipping
 func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
 	var currentIndex int = index - 1
 	for j := 0; j < counter && currentIndex >= 0; j++ {
-		if directive == "(up, " {
+		if directive == "(up," {
 			arr[currentIndex] = strings.ToUpper(arr[currentIndex])
-		} else if directive == "(low, " {
+		} else if directive == "(low," {
 			arr[currentIndex] = strings.ToLower(arr[currentIndex])
-		} else if directive == "(cap, " {
+		} else if directive == "(cap," {
 			if len(arr[currentIndex]) > 0 {
 				arr[currentIndex] = strings.ToUpper(string(arr[currentIndex][0])) + arr[currentIndex][1:]
 			}
