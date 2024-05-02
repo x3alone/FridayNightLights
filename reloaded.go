@@ -149,7 +149,7 @@ func major(arr []string) []string {
 	for i < len(arr) {
 		if strings.HasPrefix(arr[i], "(") && i > 0 && IsAlpha(arr[i-1]) {
 			// Handling each correct directive format
-			validDirective := false // we need this to adjust the index after the removal
+			validDirective := false
 			var count int
 			var err error
 
@@ -168,45 +168,38 @@ func major(arr []string) []string {
 					if num, err := strconv.ParseInt(arr[i-1], 16, 64); err == nil {
 						arr[i-1] = fmt.Sprintf("%d", num)
 						arr = append(arr[:i], arr[i+1:]...)
-						i-- // move back  for the position with possibly new directives
+						i-- // Move back to reevaluate the position with possibly new directives
 					}
 				case "(bin)":
 					if num, err := strconv.ParseInt(arr[i-1], 2, 64); err == nil {
 						arr[i-1] = fmt.Sprintf("%d", num)
 						arr = append(arr[:i], arr[i+1:]...)
-						i-- // move back  for the position with possibly new directives
+						i-- // Move back to reevaluate the position with possibly new directives
 					}
 				}
 			} else if idx := strings.Index(arr[i], ","); idx != -1 && i+1 < len(arr) {
-				if arr[i] == "(cap," || arr[i] == "(low," ||arr[i] == "(up," {
-					// handling multi commands (up, low, cap)
+				if !(arr[i] == "(cap," || arr[i] == "(low," || arr[i] == "(up,") {
+					fmt.Println("\033[1;31merror:\n\033[1;33mwrong input: invalid flag")
+					os.Exit(0)
+				}
+					// Handling repeated commands (up, low, cap)
 					directive := arr[i][:idx+1] // includes the comma
 					count, err = strconv.Atoi(strings.Trim(arr[i+1], ")"))
-					if err == nil && count > 0 && count <= countAlphabeticalBefore(arr, i) && validateDirective(directive) == true {
+					if err == nil && count > 0 && count <= countAlphabeticalBefore(arr, i) {
 						arr = MultiFormat(arr, directive, i, count)
 						validDirective = true
 						i++ // Additional increment to skip the number part
-					} else if validateDirective(directive) == false {
-						i++ // skip the directive
 					}
 				}
+
 				if validDirective {
-					// Successful directive means we need to adjust index due to the removal of a directive
+					// adjust the index aftr modifying
 					i-- // The next element shifts into the current position
 				}
-			}
 		}
 		i++ // Move to the next element
 	}
 	return arr
-}
-
-func validateDirective(directive string) bool {
-	switch directive {
-	case "(up,", "(low,", "(cap,":
-		return true
-	}
-	return false
 }
 
 func vowels(arr []string) []string {
@@ -271,6 +264,10 @@ func Quotaions(arr string) string {
 	for i := 0; i < len(arr); i++ {
 		if arr[i] == '\'' {
 			if i == 0 && LeftQuote {
+				if i == len(arr)-1 {
+					i++
+					return arr
+				}
 				if arr[i+1] == ' ' {
 					arr = arr[:i+1] + arr[i+2:]
 					res += string(arr[i])
@@ -336,16 +333,16 @@ func check(e error) {
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Println("\033[31mprovide 3 file names please")
+		fmt.Println("\033[1;31merror:\n\033[1;33mprovide 3 file names please")
 		return
 	}
-	if os.Args[2] == "main.go"{
-		fmt.Println("provide another name please")
+	if os.Args[2] == "main.go" {
+		fmt.Println("\033[1;31merror:\n\033[1;33mprovide another name please")
 		return
 	}
 	file, err := ReadFile(os.Args[1])
 	if err != nil {
-		fmt.Printf("\033[31merror reading file : %s\n", err)
+		fmt.Printf("\033[1;31merror:\n\033[1;33merror reading file : %s\n", err)
 		return
 	}
 	arr := SplitWhiteSpaces(file)
