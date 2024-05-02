@@ -267,55 +267,55 @@ func punctuationsHandler(arr []string) []string {
 
 func Quotaions(arr string) string {
 	res := ""
-	firstQuote := true
+	LeftQuote := true
 	for i := 0; i < len(arr); i++ {
 		if arr[i] == '\'' {
-			if i == 0 && firstQuote {
+			if i == 0 && LeftQuote {
 				if arr[i+1] == ' ' {
 					arr = arr[:i+1] + arr[i+2:]
 					res += string(arr[i])
-					firstQuote = false
+					LeftQuote = false
 					continue
 				} else {
-					firstQuote = false
+					LeftQuote = false
 					res += string(arr[i])
 					continue
 				}
 			}
-			if i != len(arr)-1 && i > 0 && (arr[i+1] == ' ' || arr[i-1] == ' ') && firstQuote {
+			if i != len(arr)-1 && i > 0 && (arr[i+1] == ' ' || arr[i-1] == ' ') && LeftQuote {
 				if arr[i+1] == ' ' {
 					arr = arr[:i+1] + arr[i+2:]
 					res += string(arr[i])
-					firstQuote = false
+					LeftQuote = false
 					continue
 				} else {
-					firstQuote = false
+					LeftQuote = false
 					res += string(arr[i])
 					continue
 				}
 			}
-			if !firstQuote {
+			if !LeftQuote {
 				if i != len(arr)-1 && i >= 0 && (arr[i-1] == ' ' || arr[i+1] == ' ') {
 					if arr[i-1] == ' ' {
 						res = res[:len(res)-1]
 						res += string(arr[i])
-						firstQuote = true
+						LeftQuote = true
 						continue
 					} else {
-						firstQuote = true
+						LeftQuote = true
 						res += string(arr[i])
 						continue
 					}
 				}
 			}
-			if i == len(arr)-1 && !firstQuote {
+			if i == len(arr)-1 && !LeftQuote {
 				if arr[i-1] == ' ' {
 					res = res[:len(res)-1]
 					res += string(arr[i])
-					firstQuote = true
+					LeftQuote = true
 					continue
 				} else {
-					firstQuote = false
+					LeftQuote = false
 					res += string(arr[i])
 					continue
 				}
@@ -337,6 +337,10 @@ func check(e error) {
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("\033[31mprovide 3 file names please")
+		return
+	}
+	if os.Args[2] == "main.go"{
+		fmt.Println("provide another name please")
 		return
 	}
 	file, err := ReadFile(os.Args[1])
