@@ -66,7 +66,7 @@ func applyToUpper(arr []string, index int) []string {
 		s := arr[index-1]
 		arr[index-1] = mapFirstAlphabetical(strings.ToUpper, s)
 	}
-	return append(arr[:index], arr[index+1:]...) // delete after modif
+	return append(arr[:index], arr[index+1:]...) // after modif, create a slice appending the elements excluding index which is keyword
 }
 
 func applyToLower(arr []string, index int) []string {
@@ -106,16 +106,6 @@ func mapFirstAlphabetical(transform func(string) string, s string) string { // f
 	return s // retruni string lwl if no letter is found
 }
 
-func AlphaStringsCount(arr []string) int { // uses IsAlpha to count the alpha strings so we can match the counter in major func
-	count := 0
-	for _, s := range arr {
-		if IsAlpha(s) {
-			count++
-		}
-	}
-	return count
-}
-
 func IsAlpha(s string) bool { // checks if the string contains alpha by skipping non alpha; ps i used this to skip "" or other examples
 	for _, ch := range s {
 		if unicode.IsLetter(ch) {
@@ -125,7 +115,7 @@ func IsAlpha(s string) bool { // checks if the string contains alpha by skipping
 	return false
 }
 
-func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
+func MultiFormat(arr []string, directive string, index int, counter int) []string { // handling of the directives with a counter
 	var currentIndex int = index - 1
 	for j := 0; j < counter && currentIndex >= 0; j++ {
 		if directive == "(up," {
@@ -144,10 +134,10 @@ func applyRepeatedFormat(arr []string, directive string, index int, counter int)
 	return append(arr[:index], arr[index+2:]...)
 }
 
-func countAlphabeticalBefore(arr []string, index int) int {
+func countAlphabeticalBefore(arr []string, index int) int { // used in Multi to count alpha strings inorder to see will get applied
 	count := 0
 	for i := 0; i < index; i++ {
-		if IsAlpha(arr[i]) { // Assume IsAlpha checks if the string is purely alphabetical.
+		if IsAlpha(arr[i]) { // uses IsAlpha to count the alpha strings so we can match the counter in major func
 			count++
 		}
 	}
@@ -159,7 +149,7 @@ func major(arr []string) []string {
 	for i < len(arr) {
 		if strings.HasPrefix(arr[i], "(") && i > 0 && IsAlpha(arr[i-1]) {
 			// Handling each correct directive format
-			validDirective := false
+			validDirective := false // we need this to adjust the index after the removal
 			var count int
 			var err error
 
@@ -178,34 +168,45 @@ func major(arr []string) []string {
 					if num, err := strconv.ParseInt(arr[i-1], 16, 64); err == nil {
 						arr[i-1] = fmt.Sprintf("%d", num)
 						arr = append(arr[:i], arr[i+1:]...)
-						i-- // Move back to reevaluate the position with possibly new directives
+						i-- // move back  for the position with possibly new directives
 					}
 				case "(bin)":
 					if num, err := strconv.ParseInt(arr[i-1], 2, 64); err == nil {
 						arr[i-1] = fmt.Sprintf("%d", num)
 						arr = append(arr[:i], arr[i+1:]...)
-						i-- // Move back to reevaluate the position with possibly new directives
+						i-- // move back  for the position with possibly new directives
 					}
 				}
 			} else if idx := strings.Index(arr[i], ","); idx != -1 && i+1 < len(arr) {
-				// Handling repeated commands (up, low, cap)
-				directive := arr[i][:idx+1] // includes the comma
-				count, err = strconv.Atoi(strings.Trim(arr[i+1], ")"))
-				if err == nil && count > 0 && count <= countAlphabeticalBefore(arr, i) {
-					arr = applyRepeatedFormat(arr, directive, i, count)
-					validDirective = true
-					i++ // Additional increment to skip the number part
+				if arr[i] == "(cap," || arr[i] == "(low," ||arr[i] == "(up," {
+					// handling multi commands (up, low, cap)
+					directive := arr[i][:idx+1] // includes the comma
+					count, err = strconv.Atoi(strings.Trim(arr[i+1], ")"))
+					if err == nil && count > 0 && count <= countAlphabeticalBefore(arr, i) && validateDirective(directive) == true {
+						arr = MultiFormat(arr, directive, i, count)
+						validDirective = true
+						i++ // Additional increment to skip the number part
+					} else if validateDirective(directive) == false {
+						i++ // skip the directive
+					}
 				}
-			}
-
-			if validDirective {
-				// Successful directive means we need to adjust index due to the removal of a directive
-				i-- // The next element shifts into the current position
+				if validDirective {
+					// Successful directive means we need to adjust index due to the removal of a directive
+					i-- // The next element shifts into the current position
+				}
 			}
 		}
 		i++ // Move to the next element
 	}
 	return arr
+}
+
+func validateDirective(directive string) bool {
+	switch directive {
+	case "(up,", "(low,", "(cap,":
+		return true
+	}
+	return false
 }
 
 func vowels(arr []string) []string {
@@ -335,12 +336,12 @@ func check(e error) {
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Println("file name is not provided")
+		fmt.Println("\033[31mprovide 3 file names please")
 		return
 	}
 	file, err := ReadFile(os.Args[1])
 	if err != nil {
-		fmt.Printf("error reading file : %s\n", err)
+		fmt.Printf("\033[31merror reading file : %s\n", err)
 		return
 	}
 	arr := SplitWhiteSpaces(file)
