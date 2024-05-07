@@ -1,0 +1,65 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/telemetry/counter"
+)
+
+func ReadFile(name string) (string, error) {
+	data, err := os.ReadFile(name)
+	if err != nil {
+	}
+	return string(data), nil
+}
+
+func SplitWhiteSpaces(s string) []string {
+	var result []string
+	var word string
+	for i, c := range s {
+		if c != ' ' && c != '\t' && c != '\n' {
+			word += string(c)
+		}
+		if ((c == ' ' || c == '\t') && word != "") || i == len(s)-1 {
+			result = append(result, word)
+			word = ""
+		}
+		if ((c == '\n') && word != "") || i == len(s)-1{
+			EightLines(arr) += 1
+			result = append(result, word)
+			word = ""
+		}
+	}
+	return result
+}
+func EightLines(counter int) int{
+	for counter := 0; counter < len(arr) ; counter ++{
+		if counter < 8 {
+			return 0
+		}
+		char := 8
+		for i := 1; i <= nb; i++ {
+			if char <= 0 {
+				return 0
+			}
+			char *= i
+		}
+		counter = fmt.Sprintf("%d", num)
+	}
+	return counter
+}
+
+func GetChar(arr string) string{
+	for i := 0 ; i < len()
+}
+
+func main() {
+	file, err := ReadFile(os.Args[1])
+	if err != nil {
+		fmt.Printf("error reading file : %s\n", err)
+		return
+	}
+	arr := SplitWhiteSpaces(file)
+}
+

@@ -1,0 +1,235 @@
+func applyToUpper(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToUpper(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+// Converts the preceding word to lowercase
+func applyToLower(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToLower(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+// Capitalizes the first character of the preceding word
+func applyToCapitalize(arr []string, index int) []string {
+	if index > 0 && len(arr[index-1]) > 0 {
+		arr[index-1] = strings.ToLower(string(arr[index-1])) 
+		arr[index-1] = strings.ToUpper(string(arr[index-1][0])) + arr[index-1][1:]
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+// Handles the repetitive application of formatting based on a counter
+func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
+	var currentIndex int = index - 1
+	for j := 0; j < counter && currentIndex >= 0; j++ {
+		if directive == "(up," {
+			arr[currentIndex] = strings.ToUpper(arr[currentIndex])
+		} else if directive == "(low," {
+			arr[currentIndex] = strings.ToLower(arr[currentIndex])
+		} else if directive == "(cap," {
+			if len(arr[currentIndex]) > 0 {
+				arr[currentIndex] = strings.ToUpper(string(arr[currentIndex][0])) + arr[currentIndex][1:]
+			}
+		}
+		currentIndex--
+	}
+	return append(arr[:index], arr[index+2:]...)  // Skip the directive and counter
+}
+
+// Processes each item in the array, applying transformations as directed
+func major(arr []string) []string {
+	i := 0
+	for i < len(arr) {
+		if arr[i] == "(up)" && i > 0 {
+			arr = applyToUpper(arr, i)
+		} else if arr[i] == "(low)" && i > 0 {
+			arr = applyToLower(arr, i)
+		} else if arr[i] == "(cap)" && i > 0 {
+			arr = applyToCapitalize(arr, i)
+		} else if strings.HasSuffix(arr[i], ",") && i+1 < len(arr) {
+			counter, err := strconv.Atoi(strings.Trim(arr[i+1], ")"))
+			if err == nil {
+				arr = applyRepeatedFormat(arr, arr[i], i, counter)
+			}
+		}
+		i++
+	}
+	// Filter out any remaining formatting directives in the final array
+	filtered := make([]string, 0)
+	for _, word := range arr {
+		if !strings.HasPrefix(word, "(") { // Assume any remaining item with '(' is a directive
+			filtered = append(filtered, word)
+		}
+	}
+	return filtered
+}
+
+
+
+
+---------------------
+
+
+func applyToUpper(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToUpper(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToLower(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToLower(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToCapitalize(arr []string, index int) []string {
+	if index > 0 && len(arr[index-1]) > 0 {
+		arr[index-1] = strings.ToLower(string(arr[index-1])) 
+		arr[index-1] = strings.ToUpper(string(arr[index-1][0])) + arr[index-1][1:]
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
+	var currentIndex int = index - 1
+	for j := 0; j < counter && currentIndex >= 0; j++ {
+		if directive == "(up," {
+			arr[currentIndex] = strings.ToUpper(arr[currentIndex])
+		} else if directive == "(low," {
+			arr[currentIndex] = strings.ToLower(arr[currentIndex])
+		} else if directive == "(cap," {
+			if len(arr[currentIndex]) > 0 {
+				arr[currentIndex] = strings.ToUpper(string(arr[currentIndex][0])) + arr[currentIndex][1:]
+			}
+		}
+		currentIndex--
+	}
+	return append(arr[:index], arr[index+2:]...)  // Skip the directive and counter
+}
+
+func major(arr []string) []string {
+	i := 0
+	for i < len(arr) {
+		if strings.HasPrefix(arr[i], "(") && i > 0 {
+			switch arr[i] {
+			case "(up)":
+				arr = applyToUpper(arr, i)
+			case "(low)":
+				arr = applyToLower(arr, i)
+			case "(cap)":
+				arr = applyToCapitalize(arr, i)
+			default:
+				if strings.HasSuffix(arr[i], ",") && i+1 < len(arr) {
+					counter, err := strconv.Atoi(strings.Trim(arr[i+1], ")"))
+					if err == nil {
+						arr = applyRepeatedFormat(arr, arr[i], i, counter)
+						i -= 2  // Adjust for removed elements
+					}
+				}
+			}
+			// Do not increment i if we remove the current element, because new element at i needs processing
+		} else {
+			i++
+		}
+	}
+	// Remove any unprocessed formatting instructions, assume leftover with '(' is a directive
+	filtered := []string{}
+	for _, item := range arr {
+		if !strings.HasPrefix(item, "(") {
+			filtered = append(filtered, item)
+		}
+	}
+	return filtered
+}
+
+
+
+
+
+--------------
+
+
+
+func applyToUpper(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToUpper(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToLower(arr []string, index int) []string {
+	if index > 0 {
+		arr[index-1] = strings.ToLower(arr[index-1])
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyToCapitalize(arr []string, index int) []string {
+	if index > 0 && len(arr[index-1]) > 0 {
+		arr[index-1] = strings.ToLower(string(arr[index-1]))
+		arr[index-1] = strings.ToUpper(string(arr[index-1][0])) + arr[index-1][1:]
+	}
+	return append(arr[:index], arr[index+1:]...)
+}
+
+func applyRepeatedFormat(arr []string, directive string, index int, counter int) []string {
+	var currentIndex int = index - 1
+	for j := 0; j < counter && currentIndex >= 0; j++ {
+		if directive == "(up," {
+			arr[currentIndex] = strings.ToUpper(arr[currentIndex])
+		} else if directive == "(low," {
+			arr[currentIndex] = strings.ToLower(arr[currentIndex])
+		} else if directive == "(cap," {
+			if len(arr[currentIndex]) > 0 {
+				arr[currentIndex] = strings.ToUpper(string(arr[currentIndex][0])) + arr[currentIndex][1:]
+			}
+		}
+		currentIndex--
+	}
+	return append(arr[:index], arr[index+2:]...) // Skip the directive and counter
+}
+
+func major(arr []string) []string {
+	i := 0
+	for i < len(arr) {
+		if strings.HasPrefix(arr[i], "(") && i > 0 {
+			switch arr[i] {
+			case "(up)":
+				arr = applyToUpper(arr, i)
+			case "(low)":
+				arr = applyToLower(arr, i)
+			case "(cap)":
+				arr = applyToCapitalize(arr, i)
+			default:
+				if strings.HasSuffix(arr[i], ",") && i+1 < len(arr) {
+					counter, err := strconv.Atoi(strings.Trim(arr[i+1], ")"))
+					if err == nil {
+						arr = applyRepeatedFormat(arr, arr[i], i, counter)
+						i -= 2 // Adjust for removed elements
+					}
+				}
+			}
+			// Do not increment i if we remove the current element, because new element at i needs processing
+		} else {
+			i++
+		}
+	}
+	// Remove any unprocessed formatting instructions, assume leftover with '(' is a directive
+	filtered := []string{}
+	for _, item := range arr {
+		if !strings.HasPrefix(item, "(") {
+			filtered = append(filtered, item)
+		}
+	}
+	return filtered
+}
+---------------
+
+
+
