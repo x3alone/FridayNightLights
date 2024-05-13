@@ -1,0 +1,118 @@
+package main
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+func read_file(file string) []string {
+	data, err := os.ReadFile(file)
+	if file == "thinkertoy.txt" {
+		data = []byte(strings.ReplaceAll(string(data), "\r", ""))
+	}
+	if err != nil {
+		fmt.Print(err)
+	}
+	split := strings.Split(string(data), "\n\n")
+	split[0] = strings.TrimPrefix(split[0], "\n")
+	return split
+}
+func array_2d(data []string) [][]string {
+	two_d_array := make([][]string, len(data))
+	for i, line := range data {
+		lines := strings.Split(line, "\n")
+		two_d_array[i] = make([]string, len(lines))
+		copy(two_d_array[i], lines)
+	}
+	return two_d_array
+}
+func print_shapes(shape [][]string, str, file string) {
+	i := 0
+	var to_print []string
+	var check []string
+	var new []string
+	check = append(check, str)
+	str = strings.ReplaceAll(str, "\\n", "\n")
+	if strings.Contains(str, "\n") {
+		check = strings.Split(str, "\n")
+		new = check
+	} else {
+		new = append(new, str)
+	}
+	for _, line := range new {
+		if line != "" {
+			for i < 8 {
+				for _, c := range line {
+					to_print = append(to_print, shape[int(c)-32][i])
+				}
+				st := strings.Join(to_print, "")
+				to_print = nil
+				fmt.Printf("%s\n", st)
+				i++
+			}
+			i = 0
+			
+		} else {
+			fmt.Printf("\n")
+		}
+	}
+}
+func check_input(str string) {
+	i := 0
+	for range str {
+		if (str[i] < 32 || str[i] > 126) && str[i] != '\n' {
+			fmt.Printf("Error : Please provide a string with supported charachters !")
+			os.Exit(1)
+		}
+		i++
+	}
+}
+func check_newline(str string) bool {
+	str = strings.ReplaceAll(str, "\\n", "\n")
+	if len(str) == 0 {
+		return true
+	} else if len(str) == 1 && str[0] == '\n' {
+		fmt.Print("\n")
+		return true
+	}
+	return false
+}
+func standard_art(str string) {
+	check_input(str)
+	if check_newline(str) {
+		return
+	}
+	data := read_file("standard.txt")
+	shape := array_2d(data)
+	print_shapes(shape, str, "")
+}
+func fs_art(str, banner string) {
+	check_input(str)
+	if check_newline(str) {
+		return
+	}
+	data := read_file(banner + ".txt")
+	shape := array_2d(data)
+	print_shapes(shape, str, "")
+}
+func output_art(str, file, banner string) {
+	check_input(str)
+	if check_newline(str) {
+		return
+	}
+	data := read_file(banner + ".txt")
+	shape := array_2d(data)
+	print_shapes(shape, str, file)
+}
+func main() {
+	if len(os.Args) == 2 {
+		standard_art(os.Args[1])
+		return
+	}
+	if len(os.Args) == 3 && (os.Args[2] == "standard" || os.Args[2] == "shadow" || os.Args[2] == "thinkertoy") {
+		fs_art(os.Args[1], os.Args[2])
+		return
+	}
+	if len(os.Args) == 4 && os.Args[1][:9] == "--output=" && os.Args[1][len(os.Args[1])-4:] == ".txt" && (os.Args[3] == "standard" || os.Args[3] == "shadow" || os.Args[3] == "thinkertoy") {
+		output_art(os.Args[2], os.Args[1][9:], os.Args[3])
+	}
+}
