@@ -40,8 +40,6 @@ func GetColor(color string) string {
 		return "\033[35m"
 	case "cyan":
 		return "\033[36m"
-	case "white":
-		return "\033[37m"
 	default:
 		return "\033[0m"
 	}
@@ -59,6 +57,16 @@ func GetColor(color string) string {
 // 	return result.String()
 // }
 
+func getIndex(line, input string) []int {
+	indx := []int{}
+	for index1 := 0; len(line)-len(input) >= index1; index1++ {
+		if line[index1:index1+len(input)] == input {
+			indx = append(indx, index1)
+		}
+	}
+	return indx
+}
+
 func print_shapes(shape [][]string, str string, color string, input string) {
 	i := 0
 	// tmp := ""
@@ -71,20 +79,27 @@ func print_shapes(shape [][]string, str string, color string, input string) {
 		new = append(new, str)
 	}
 	colorCode := GetColor(color)
-
 	for _, line := range new {
 		if line != "" {
 			for i < 8 {
 				for index1, c := range line {
 					if strings.Contains(line, input) {
-						index := strings.Index(line, input)
-						if index1 >= index && index1 <= index+len(input)-1 {
-							to_print = append(to_print, fmt.Sprintf("%s%s%s", colorCode, shape[int(c)-32][i], "\033[0m"))
-						} else {
-							to_print = append(to_print, shape[int(c)-32][i])
+						count := getIndex(line, input)
+						// fmt.Print(count)
+						// os.Exit(1)
+						for j, n := range count {
+							if index1 >= n && index1 <= n+len(input)-1 {
+								to_print = append(to_print, fmt.Sprintf("%s%s%s", colorCode, shape[int(c)-32][i], "\033[0m"))
+								break
+							}
+							if j == len(count)-1 && !(index1 >= n && index1 <= n+len(input)-1) {
+								to_print = append(to_print, shape[int(c)-32][i])
+							}
 						}
+						// to_print = append(to_print, shape[int(c)-32][i])
+
 					} else {
-						to_print = append(to_print, shape[int(c)-32][i])
+						to_print = append(to_print, shape[int(c)-32][i]) // replace the indexes i had that need to get colored with the colored ones in the loop if it functions
 					}
 				}
 				st := strings.Join(to_print, "")
