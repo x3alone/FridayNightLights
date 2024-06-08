@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"> <!-- identifying the language of the page -->
+  <head>
+    <title>ascii-art-web</title> <!-- metadata not displayable but used to give info about the page -->
+  </head>
+  <body>
+    <main>
+      <h1>ascii-art-web</h1>
+      <section>
+        <form id="asciiForm" action=""> <!-- here asciiform so i can find and use the input and the banners with js -->
+          <input type="text" name="input" placeholder="TYPE SOMETHING.." required>
+          <button type="submit">Submit</button>
+          <fieldset>
+            <legend>choose a banner!</legend>
+            <label><input id="standard" type="radio" name="banner" value="standard" checked> standard</label>
+            <label><input id="shadow" type="radio" name="banner" value="shadow"> shadow</label>
+            <label><input id="thinkertoy" type="radio" name="banner" value="thinkertoy"> thinkertoy</label>
+          </fieldset>
+        </form>
+      </section>
+      <section>
+        <h2>OUTPUT</h2>
+        <fieldset>
+          <div id="outputBox"></div>
+        </fieldset>
+      </section>
+    </main>
+    <footer>
+        <p>
+          7o9o9 lbr9o9 - <a href="https://learn.zone01oujda.ma/intra/oujda/module/ascii-art-web?event=62">ochouari, Yhoussai, ifoukahi</a>
+        </p>
+      </footer>
+  </body>
+  <script>
+    document.getElementById('asciiForm').addEventListener('submit', function(event) { //when the form is "submitted/triggered" (eeevent) aka action,  this gets the form (input and banner)
+      event.preventDefault(); //when the form is "triggered" it sends it back to the server and the page gets reloaded: thus to avoid page getting refreshed this prevents it  so we can handle this with js enstead
+      const inputText = event.target.elements['input'].value;
+      const selectedBanner = event.target.elements['banner'].value;
+      const outputBox = document.getElementById('outputBox');
+      
+      outputBox.textContent = `Input: ${inputText}, Banner: ${selectedBanner}`; //store the data in outputbox to dispaly --> this needs to be linked to the asciiart here it only shows the input and the banner in the output
+    });
+  </script>
+</html>
