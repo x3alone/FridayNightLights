@@ -69,7 +69,6 @@ func getIndex(line, input string) []int {
 
 func print_shapes(shape [][]string, str string, color string, input string) {
 	i := 0
-	// tmp := ""
 	var to_print []string
 	var new []string
 	str = strings.ReplaceAll(str, "\\n", "\n")
@@ -85,8 +84,6 @@ func print_shapes(shape [][]string, str string, color string, input string) {
 				for index1, c := range line {
 					if strings.Contains(line, input) {
 						count := getIndex(line, input)
-						// fmt.Print(count)
-						// os.Exit(1)
 						for j, n := range count {
 							if index1 >= n && index1 <= n+len(input)-1 {
 								to_print = append(to_print, fmt.Sprintf("%s%s%s", colorCode, shape[int(c)-32][i], "\033[0m"))
@@ -96,7 +93,6 @@ func print_shapes(shape [][]string, str string, color string, input string) {
 								to_print = append(to_print, shape[int(c)-32][i])
 							}
 						}
-						// to_print = append(to_print, shape[int(c)-32][i])
 
 					} else {
 						to_print = append(to_print, shape[int(c)-32][i]) // replace the indexes i had that need to get colored with the colored ones in the loop if it functions
@@ -118,7 +114,7 @@ func check_input(str string) bool {
 	i := 0
 	for range str {
 		if (str[i] < 32 || str[i] > 126) && str[i] != '\n' {
-			fmt.Printf("\033[1m\033[31mError: Please provide a string with supported characters!\n")
+			fmt.Println("Error : Please provide a string of charachters in range from 32 to 126 in the ascii table")
 			return true
 		}
 		i++
