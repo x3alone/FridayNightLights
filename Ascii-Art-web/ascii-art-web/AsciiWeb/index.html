@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ascii-art-web</title>
+</head>
+<body>
+  <h1>Ascii-Art-Web</h1>
+  <form action="/ascii-art" method="POST">
+    <textarea name="input" placeholder="TYPE SOMETHING.." required></textarea>
+    <br><br>
+    <fieldset>
+      <legend>choose a banner!</legend>
+      <label><input type="radio" name="banners" value="standard" checked> standard</label>
+      <label><input type="radio" name="banners" value="shadow"> shadow</label>
+      <label><input type="radio" name="banners" value="thinkertoy"> thinkertoy</label>
+    </fieldset>
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>

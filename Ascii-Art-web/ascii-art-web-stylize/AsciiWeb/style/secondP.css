@@ -1,0 +1,37 @@
+body {
+    font-family: Nimbus Mono PS, Courier New;
+    font-weight: 30;
+    background-color: #62c3de;
+    margin: 0;
+    padding: 0;
+}
+
+.nav {
+    background-color: aliceblue;
+    padding: 10px;
+    text-align: center;
+}
+
+.nav a {
+    font-size: 50px;
+    text-shadow: 0 0 4px #000000;
+    color: #ffffff;
+    margin: 0 10px;
+}
+
+.contain {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 20px;
+    top: 90px;
+}
+
+@media (max-width: 450px) {
+    .nav a {
+        font-size: 30px;
+    }
+
+    .contain pre {
+        font-size: 8px;
+    }
+}
