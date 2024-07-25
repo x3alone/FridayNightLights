@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ascii-art-web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="ascii/img/logo.png">
+  <link rel="stylesheet" href="ascii/firstP.css">
+</head>
+
+<body>
+  <center>
+    <h1 class="c">Ascii-Art-Web</h1>
+    <form action="/ascii-art" method="POST">
+      <textarea name="input" maxlength="250" required></textarea>
+        <div class="choose">
+            <input type="radio" id="standard" name="banners" value="standard" checked>
+            <label for="standard">Standard</label>
+            
+            <input type="radio" id="shadow" name="banners" value="shadow">
+            <label for="shadow">Shadow</label>
+            
+            <input type="radio" id="thinkertoy" name="banners" value="thinkertoy">
+            <label for="thinkertoy">Thinkertoy</label>
+        </div>
+        <center>
+      <button type="submit">Submit</button>
+        </center>
+    </form>
+  </center>
+</body>
+
+</html>

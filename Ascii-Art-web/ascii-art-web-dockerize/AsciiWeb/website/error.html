@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Page</title>
+    <style>
+        body {
+            background-color: rgb(0, 0, 0);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        img {
+            width: 200px;
+            height: auto;
+        }
+
+        .error {
+            padding-top: 30px;
+            text-align: center;
+        }
+
+        .error h1 {
+            color: #ffffff;
+            font-size: 50px;
+            margin: 0;
+        }
+
+        .error pre {
+            font-size: 20px;
+            padding: 10px;
+            color: #bababa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="error">
+        <h1>Error</h1>
+        <pre>{{.}}</pre>
+        <img src="/ascii/img/cat.gif"></img>
+    </div>
+</body>
+
+</html>
