@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style/morinfo_style.css">
+	<link rel="icon" href="{{.Artist.Image}}">
+	<link href='https://fonts.googleapis.com/css?family=JetBrains Mono' rel='stylesheet'>
+	<title>{{.Artist.Name}}</title>
+	<!-- map script  -->
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCTAVP5kfJGMAH2KoX8qo-n7r90Iosbjg"></script>
+	<script src="style/script.js"></script>
+</head>
+
+<body onload="initMap()">
+	<div>
+		<div class="button-container">
+			<a href="/">Back to Home</a>
+		</div>
+		<center>
+			<img src="{{.Artist.Image}}" alt="{{.Artist.Name}}" />
+		</center>
+		<h1>Artist</h1>
+		<p><strong>Name:</strong> {{.Artist.Name}}</p>
+		<p><strong>ID:</strong> {{.Artist.Id}}</p>
+		<p><strong>Members:</strong> {{range .Artist.Members}}{{.}}, {{end}}</p>
+		<p><strong>Creation Date:</strong> {{.Artist.CreationDate}}</p>
+		<p><strong>First Album:</strong> {{.Artist.FirstAlbum}}</p>
+		
+		<strong>
+			<h1>Locations</h1>
+		</strong>
+		<input type="hidden" id="loc" value="{{.GoogleMap}}">
+		<div class="googlemap" id="map"></div>
+		<strong>
+			<h1>Date</h1>
+		</strong>
+		<ul>
+			{{range .DateST.Dates}}
+			<li>{{.}}</li>
+			{{end}}
+		</ul>
+
+		<strong>
+			<h1>Relation</h1>
+		</strong>
+		<ul>
+			{{range $key, $value := .RelationST.DatesLocation}}
+			<li><strong>{{ $key }}:</strong>
+				<ul>
+					{{range $value}}
+					<li>{{.}}</li>
+					{{end}}
+				</ul>
+			</li>
+			{{end}}
+		</ul>
+	</div>
+</body>
+
+</html>

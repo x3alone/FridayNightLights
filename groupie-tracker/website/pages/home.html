@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/home_style.css">
+    <title>groupie-tracker</title>
+    <link rel="icon" type="image/x-icon" href="https://avatars.githubusercontent.com/u/44205180?v=4">
+    <link href="https://fonts.googleapis.com/css?family=JetBrains Mono" rel="stylesheet">
+</head>
+
+<body>
+    <h1>
+        <center>Groupie Tracker</center>
+    </h1>
+    <div class="containt">
+        {{range .}}
+        <form action="/getinfo" method="POST">
+            <div class="artist-card">
+                <input type="hidden" value={{.Id}} name="Art-ID">
+                <img src="{{.Image}}" alt="{{.Name}}">
+                <h2>{{.Name}}</h2>
+                <p><strong>Creation Year:</strong> {{.CreationDate}}</p>
+                <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+                <center><button type="submit">Get more info</button></center>
+            </div>
+        </form>
+        {{end}}
+    </div>
+</body>
+
+</html>
